@@ -100,8 +100,7 @@ src/
 │   │   └── services/         # HTTP services, theme, toast
 │   ├── features/             # Feature modules
 │   │   └── products/         # Product management feature
-│   │       ├── components/   # Reusable product components
-│   │       ├── pages/        # Product pages (list, form)
+│   │       ├── components/   # Product (list, form)
 │   │       └── store/        # NgRx store (actions, effects, reducers)
 │   ├── shared/               # Shared components and models
 │   │   ├── components/       # Reusable UI components
