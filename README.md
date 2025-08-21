@@ -67,7 +67,7 @@ A modern, responsive web application built with Angular 18+ for managing e-comme
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Sselim1/ecommerce-task.git
    cd ecommerce-dashboard
    ```
 
