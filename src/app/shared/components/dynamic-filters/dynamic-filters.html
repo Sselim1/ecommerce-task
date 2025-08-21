@@ -1,0 +1,15 @@
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <input type="text" placeholder="Search by name" class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2" [(ngModel)]="search" (ngModelChange)="emit()" />
+      <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2" [(ngModel)]="status" (change)="emit()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2" [(ngModel)]="sortField" (change)="emit()">
+        <option *ngFor="let s of sortOptions" [value]="s.value">{{ s.label }}</option>
+      </select>
+      <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2" [(ngModel)]="sortOrder" (change)="emit()">
+        <option value="asc">Asc</option>
+        <option value="desc">Desc</option>
+      </select>
+    </div>

@@ -1,0 +1,91 @@
+<div class="space-y-4">
+      <!-- Header Row -->
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">Products</div>
+        <a routerLink="/products/new" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors">Add Product</a>
+      </div>
+
+      <!-- Filters -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <input type="text" placeholder="Search by name" class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="search" (ngModelChange)="onSearchChange($event)" />
+        <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="status" (change)="onStatusChange($event)">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="sortField" (change)="onSortChange()">
+          <option *ngFor="let s of sortOptions" [value]="s.value">{{ s.label }}</option>
+        </select>
+        <select class="rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" [(ngModel)]="sortOrder" (change)="onSortChange()">
+          <option value="asc">Asc</option>
+          <option value="desc">Desc</option>
+        </select>
+      </div>
+
+      <!-- Loading Skeleton -->
+      <app-loading-skeleton *ngIf="loading$ | async" [count]="6"></app-loading-skeleton>
+
+      <!-- Error State -->
+      <div *ngIf="(error$ | async) as err" class="rounded-md border border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-3">{{ err }}</div>
+
+      <!-- Empty State -->
+      <div *ngIf="(isEmpty$ | async)" class="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-6 text-center text-gray-600 dark:text-white">No products found.</div>
+
+      <!-- Table on desktop -->
+      <div *ngIf="!(loading$ | async) && (products$ | async) as products" class="hidden lg:block">
+        <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-white">Image</th>
+                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-white">Name</th>
+                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-white">Price</th>
+                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-white">Stock</th>
+                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-white">Status</th>
+                <th class="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-600 bg-white dark:bg-gray-900">
+              <tr *ngFor="let p of products; trackBy: trackById" class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                <td class="px-3 py-2"><img [src]="p.image" loading="lazy" class="h-12 w-12 object-cover rounded-lg" /></td>
+                <td class="px-3 py-2 text-gray-900 dark:text-white font-medium">{{ p.name }}</td>
+                <td class="px-3 py-2 text-gray-900 dark:text-white">{{ p.price | currency }}</td>
+                <td class="px-3 py-2 text-gray-900 dark:text-white">{{ p.stock }}</td>
+                <td class="px-3 py-2"><span [ngClass]="p.status === 'active' ? 'text-green-700 bg-green-100 dark:text-green-100 dark:bg-green-900/30' : 'text-yellow-800 bg-yellow-100 dark:text-yellow-100 dark:bg-yellow-900/30'" class="px-2 py-1 rounded-full text-xs font-medium">{{ p.status }}</span></td>
+                <td class="px-3 py-2 text-right space-x-2">
+                  <a [routerLink]="['/products', p.id]" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline transition-colors">Edit</a>
+                  <button (click)="delete(p.id)" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:underline transition-colors">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cards on mobile -->
+      <div *ngIf="!(loading$ | async) && (products$ | async) as products" class="grid grid-cols-1 sm:grid-cols-2 lg:hidden gap-4">
+        <div *ngFor="let p of products; trackBy: trackById" class="rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex gap-3">
+            <img [src]="p.image" loading="lazy" class="h-16 w-16 object-cover rounded-lg flex-shrink-0" />
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-gray-900 dark:text-white truncate">{{ p.name }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ p.price | currency }} · Stock: {{ p.stock }}</div>
+              <div class="mt-2"><span [ngClass]="p.status === 'active' ? 'text-green-700 bg-green-100 dark:text-green-100 dark:bg-green-900/30' : 'text-yellow-800 bg-yellow-100 dark:text-yellow-100 dark:bg-yellow-900/30'" class="px-2 py-1 rounded-full text-xs font-medium">{{ p.status }}</span></div>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-end gap-3">
+            <a [routerLink]="['/products', p.id]" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline transition-colors text-sm font-medium">Edit</a>
+            <button (click)="delete(p.id)" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:underline transition-colors text-sm font-medium">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <app-pagination
+        [currentPage]="(pagination$ | async)?.currentPage || 1"
+        [totalPages]="(pagination$ | async)?.totalPages || 0"
+        [total]="(pagination$ | async)?.total || 0"
+        [pageSize]="(pagination$ | async)?.limit || 10"
+        (pageChange)="onPageChange($event.page, $event.limit)"
+      ></app-pagination>
+    </div>
